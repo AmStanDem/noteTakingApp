@@ -1,13 +1,18 @@
 <?php
-$env = parse_ini_file('.env');
-$host='localhost';
-$username='root';
-$password='';
-$db='note_taking_app';
-$dbprefix='';
+use Dotenv\Dotenv;
+require_once __DIR__ . '/vendor/autoload.php';
 
-$mysqli = new mysqli($host, $username, $password, $db);
-if($mysqli->connect_errno) {
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+$host=$_ENV['DB_HOST'];
+$username=$_ENV['DB_USERNAME'];
+$password=$_ENV['DB_PASSWORD'];
+$database=$_ENV['DB_DATABASE'];
+$mysqli = new mysqli($host, $username, $password, $database);
+if($mysqli->connect_errno)
+{
     die('DB connection error: '.$mysqli->connect_error);
 }
+
 ?>
