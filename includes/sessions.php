@@ -6,7 +6,7 @@ $logged_in = $_SESSION['logged_in'] ?? false;
 function require_login($logged_in): void
 {
     if ($logged_in === false) {
-        header("Location: public/php/login.php");
+        header("Location: ../../public/php/login.php");
         exit;
     }
 }
@@ -17,6 +17,7 @@ function login($email)
     $_SESSION['logged_in'] = true;
     $_SESSION['email'] = $email;
 }
+
 function logout()
 {
     session_unset();

@@ -10,8 +10,8 @@ $username = $_ENV['DB_USERNAME'];
 $password = $_ENV['DB_PASSWORD'];
 $database = $_ENV['DB_DATABASE'];
 
-$mysqli = new mysqli($host, $username, $password, $database);
-if($mysqli->connect_errno)
+$connect = new mysqli($host, $username, $password, $database);
+if($connect->connect_errno)
 {
-    die('DB connection error: '.$mysqli->connect_error);
+    die('DB connection error: '.$connect->connect_error);
 }
