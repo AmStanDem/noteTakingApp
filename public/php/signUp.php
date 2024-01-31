@@ -59,7 +59,6 @@ require '../../src/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
-    echo 'fff';
     $nome = $_POST['nome'];
     $cognome = $_POST['cognome'];
     $email = $_POST['email'];
@@ -78,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
         }
         else
         {
-            echo 'ddd';
             $password = password_hash($password, PASSWORD_DEFAULT);
             if(insertUser($nome, $cognome, $email, $password, $connect))
             {

@@ -36,16 +36,7 @@ function insertUser($nome, $cognome,$email, $password, $connect): bool
 
 }
 
-function getPasswordFromEmail($email, $connect):string
-{
-    $sql = "SELECT * FROM utenti WHERE EMAIL = ?";
-    $query = $connect->prepare($sql);
-    $query->bind_param("s", $email);
-    $query->execute();
-    $result = $query->get_result();
-    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
-    return $row['password'];
-}
+
 
 function checkDataLogin($email, $password): bool
 {
@@ -54,24 +45,55 @@ function checkDataLogin($email, $password): bool
     }
     return false;
 }
-
-function checkDataLink($url): bool
+function getIdFromUtente($email, $connect): int
 {
-    if (isset($url)) {
-        return true;
-    }
-    return false;
-}
-
-function getIdFromUser($email, $password, $connect): int
-{
-    $sql = "SELECT * FROM utenti  WHERE EMAIL = ? and password = ?";
+    $sql = "SELECT * FROM utenti  WHERE EMAIL = ?";
     $query = $connect->prepare($sql);
-    $query->bind_param("ss", $email, $password);
+    $query->bind_param("s", $email);
     $query->execute();
     $result = $query->get_result();
     $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
     return $row['id'];
+}
+function getNomeFromUtente($email, $connect): string
+{
+    $sql = "SELECT * FROM utenti  WHERE EMAIL = ?";
+    $query = $connect->prepare($sql);
+    $query->bind_param("s", $email);
+    $query->execute();
+    $result = $query->get_result();
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    return $row['nome'];
+}
+function getCognomeFromUtente($email, $connect): string
+{
+    $sql = "SELECT * FROM utenti  WHERE EMAIL = ?";
+    $query = $connect->prepare($sql);
+    $query->bind_param("s", $email);
+    $query->execute();
+    $result = $query->get_result();
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    return $row['cognome'];
+}
+function getEmailFromUtente($id, $connect): string
+{
+    $sql = "SELECT * FROM utenti  WHERE id = ?";
+    $query = $connect->prepare($sql);
+    $query->bind_param("s", $id);
+    $query->execute();
+    $result = $query->get_result();
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    return $row['email'];
+}
+function getPasswordFromUtente($email, $connect):string
+{
+    $sql = "SELECT * FROM utenti WHERE EMAIL = ?";
+    $query = $connect->prepare($sql);
+    $query->bind_param("s", $email);
+    $query->execute();
+    $result = $query->get_result();
+    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+    return $row['password'];
 }
 
 function checkUserExistLogin($email, $password, $connect): bool
@@ -84,7 +106,7 @@ function checkUserExistLogin($email, $password, $connect): bool
 
     if (mysqli_num_rows($result))
     {
-        $hashedPassword = getPasswordFromEmail($email, $connect);
+        $hashedPassword = getPasswordFromUtente($email, $connect);
         if (password_verify($password, $hashedPassword))
         {
             return true;
@@ -94,46 +116,38 @@ function checkUserExistLogin($email, $password, $connect): bool
 
 }
 
-function insertLinkUser($linkId, $userId, $titolo, $letto, $categoria, $connect)
+function insertNota($contenuto, $titolo,$id_cartella, $id_categoria, $connect)
 {
-    $sql = "INSERT INTO link_utente (id_utente, id_link, titolo, id_categoria, letto)
+    $sql = "INSERT INTO note (contenuto,titolo,id_cartella,id_categoria)
             VALUES 
-            ('$userId','$linkId','$titolo','$categoria', '$letto')";
-    if ($connect->query($sql) === TRUE) {
-        return true;
-    } else {
-        return false;
-    }
-
-}
-
-function checkLinkUserData($linkId, $userId, $titolo, $letto, $categoria)
-{
-    if (isset($linkId) && isset($userId) && isset($titolo) && isset($letto) && isset($categoria)) {
-        return true;
-    }
-    return false;
-}
-
-function insertUrl($url, $connect)
-{
-    $sql = "INSERT INTO link (url)
-            VALUES 
-            ('$url')";
+            ('$contenuto','$titolo','$id_cartella','$id_categoria')";
     if ($connect->query($sql) === TRUE) {
         return true;
     } else {
         return false;
     }
 }
-
-function getLinkId($url, $connect)
+function updateNota($id,$contenuto,$titolo,$id_cartella, $id_categoria, $connect)
 {
-    $sql = "SELECT * FROM link  WHERE url = ?";
-    $query = $connect->prepare($sql);
-    $query->bind_param("s", $url);
-    $query->execute();
-    $result = $query->get_result();
-    $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
-    return $row['id'];
+    $sql = "UPDATE table note 
+            set contenuto = '$contenuto', titolo = '$titolo', id_cartella = '$id_cartella', id_categoria = '$id_categoria'
+            where id = '$id'";
+
+    if ($connect->query($sql) === TRUE) {
+        return true;
+    } else {
+        return false;
+    }
 }
+function deleteNota($id,$connect)
+{
+    $sql = "DELETE * from note where id = '$id'";
+
+    if ($connect->query($sql) === TRUE) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+

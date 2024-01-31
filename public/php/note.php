@@ -2,7 +2,6 @@
 global $connect;
 require '../../config/connect.php';
 require '../../src/functions.php';
-require '../../includes/sessions.php';
 ?>
 <!doctype html>
 <html lang="it">
@@ -11,7 +10,7 @@ require '../../includes/sessions.php';
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Accedi</title>
+    <title>Registrazione</title>
     <link rel="icon" href="../../public/assets/images/appIcon.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
@@ -24,8 +23,16 @@ require '../../includes/sessions.php';
                 <div class="col-12 col-md-9 col-lg-7 col-xl-6">
                     <div class="card" style="border-radius: 15px; background-color: white;">
                         <div class="card-body p-5">
-                            <h2 style="color: #080A0B" class="text-uppercase text-center mb-5">Accedi</h2>
+                            <h2 style="color: #080A0B" class="text-uppercase text-center mb-5">Crea un'account</h2>
                             <form action="<?=htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
+                                <div class="form-outline mb-4">
+                                    <input type="text" name="titolo" id="titolo" class="form-control form-control-lg" maxlength="100" required/>
+                                    <label class="form-label" for="titolo">Titolo</label>
+                                </div>
+                                <div class="form-outline mb-4">
+                                    <textarea name="contenuto" id="contenuto" class="form-control form-control-lg"></textarea>
+                                    <label class="form-label" for="contenuto">Contenuto</label>
+                                </div>
                                 <div class="form-outline mb-4">
                                     <input type="email" name="email" id="email" class="form-control form-control-lg" maxlength="100" placeholder="Email" required/>
                                     <label class="form-label" for="email">Email</label>
@@ -35,9 +42,9 @@ require '../../includes/sessions.php';
                                     <label class="form-label" for="password">Password</label>
                                 </div>
                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" style="background-color: teal;" class="btn btn-primary btn-lg">Accedi!</button>
+                                    <button type="submit" style="background-color: teal;" class="btn btn-primary btn-lg">Registrati!</button>
                                 </div>
-                                <p class="text-center mt-5 mb-0">Non hai un account? <a style="text-decoration: none !important;" href="signUp.php">Registrati qui</a></p>
+                                <p class="text-center mt-5 mb-0">Hai già un'account? <a style="text-decoration: none !important;" href="login.php">Accedi qui</a></p>
                             </form>
                         </div>
                     </div>
@@ -52,35 +59,34 @@ require '../../includes/sessions.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST')
 {
+    $nome = $_POST['nome'];
+    $cognome = $_POST['cognome'];
     $email = $_POST['email'];
     $password = $_POST['password'];
-    if (!checkDataLogin($email, $password))
+    if (!checkSignUpValues($nome, $cognome, $email, $password))
     {
         echo "<script>alert('Invalid values')</script>";
         exit();
     }
     else
     {
-        if (checkUserExistLogin($email, $password, $connect))
+        if (checkIfUserExistSignUp($email, $connect))
         {
-
-            $hashedPassword = getPasswordFromUtente($email,$connect);
-            $userId = getIdFromUtente($email, $connect);
-            $nome = getNomeFromUtente($email,$connect);
-            $cognome = getCognomeFromUtente($email,$connect);
-            login($userId,$nome,$cognome, $email,$password);
-            /*
-            $_SESSION['userId'] = $userId;
-            $_SESSION['email'] = $email;
-            $_SESSION['hashedPassword'] = $hashedPassword;
-            $_SESSION['logged_in'] = true;
-            */
-            header('location:../../public/index.php');
+            echo "<script>alert('User already present')</script>";
+            exit();
         }
         else
         {
-            echo "<script>alert('email or password wrong')</script>";
-            exit();
+            $password = password_hash($password, PASSWORD_DEFAULT);
+            if(insertUser($nome, $cognome, $email, $password, $connect))
+            {
+                header('location:../../public/php/login.php');
+            }
+            else
+            {
+                echo "<script>alert('Something went wrong')</script>";
+                exit();
+            }
         }
     }
     $connect->close();
